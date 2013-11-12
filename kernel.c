@@ -14,7 +14,7 @@ void readString (char* line);
 void readSector (char* buffer, int sector);
 int mod (int dividend, int divisor);
 int div (int dividend, int divisor);
-
+void handleInterrupt21(int ax, int bx, int cx, int dx);
 
 int j = 0;
 
@@ -26,20 +26,30 @@ int main ()
 	 * print this line to the screen
 	 */
 
-	/*step 2: read from keyboard*/
+	/* step 1: print to screen*/
+	// printString ("Hello World\0");
+
+	/* step 2: read from keyboard*/
 	// char line[LENGTH_LINE];
 	// printString ("Enter a line: \0");
 	// readString (line);
 	// printString (line);
 
-	/*step 3: read a sector from disk*/
-	char buffer[LENGTH_SECTOR];
-	readSector (buffer, 30);
-	printString (buffer);
+	/* step 3: read a sector from disk*/
+	// char buffer[LENGTH_SECTOR];
+	// readSector (buffer, 30);
+	// printString (buffer);
+
+	/* step 4: creating my own interrupt
+	 * Link interrupt 21 to my service routine
+	 * In other words, set the interrupt table
+	 */
+	makeInterrupt21();
+	interrupt(0x21, 0, 0, 0, 0);
 
 	while (1)
 	{
-		
+		// Infinite Loop
 	}
 	return 0;
 }
@@ -52,7 +62,7 @@ void printString (char* word)
 	 * else return
 	 */
 
-	/* start at a new line*/
+	/* start at a new line */
 	char al = '\n';
 	char ah = 0x0e;
 	int ax = ah * 256 + al;
@@ -116,15 +126,15 @@ void readString (char* line)
 }
 
 void readSector (char* buffer, int sector){
-	/*read a sector from disk, interrupt 0x13*/
-	/*
+	/* read a sector from disk, interrupt 0x13
 	 * AH = 2 this number tells the BIOS to read
 	 * AL = number of sectors to read
 	 * BX = address where the data should be stored to
 	 * CH = track number
 	 * CL = relative sector number
 	 * DH = head number
-	 * DL = device number (for the floppy disk, use 0)*/
+	 * DL = device number (for the floppy disk, use 0)
+	 */
 	int ax = 2 * 256 + 1;
 	int bx = buffer;
 	int ch = div (sector, 36);
@@ -150,4 +160,12 @@ int div (int dividend, int divisor)
 	while (q * divisor <= dividend)
 		q = q + 1;
 	return q-1;
+}
+
+void handleInterrupt21(int ax, int bx, int cx, int dx){
+	/* User Mode: Application program, Wrapper Function
+	 * Kernel Mode: Trap handler (interrupt table), System call service routine
+	 * To conlude, the interrupt fucntion I defined is running in kernel mode
+	 */
+	printString("Hello World\0");
 }
