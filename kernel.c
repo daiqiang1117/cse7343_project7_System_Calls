@@ -1,5 +1,5 @@
 /*	kernel.c
-	A simple kernel that displays "Hello World"
+	Implement printString, readString, readSector and a simple own interrupt
 	
 	Qiang Dai
 */
