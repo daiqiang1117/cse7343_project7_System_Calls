@@ -93,6 +93,7 @@ void readString (char* line)
 	{
         /* the AH must equal 0 and AL doesn't matter */
 		temp = interrupt (0x16, 0, 0, 0, 0);
+		
 		/* only if the input is "ENTER", the loop ends*/
 		if (temp == 0xd)
 			break;
@@ -167,5 +168,12 @@ void handleInterrupt21(int ax, int bx, int cx, int dx){
 	 * Kernel Mode: Trap handler (interrupt table), System call service routine
 	 * To conlude, the interrupt fucntion I defined is running in kernel mode
 	 */
-	printString("Hello World\0");
+	if (ax == 0)
+		printString(bx);
+	else if (ax == 1)
+		readString(bx);
+	else if (ax == 2)
+		readSector(bx, cx);
+	else
+		printString("Durp!");
 }
